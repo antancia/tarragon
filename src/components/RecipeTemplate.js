@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import {
+  Button,
   Card,
   CardBody,
   CardText,
@@ -12,6 +13,7 @@ import {
 
 export default function RecipeTemplate() {
   const [title, setTitle] = useState('');
+  const [newIngredient, setNewIngredient] = useState('');
   const [ingredients, setIngredients] = useState([
     { name: 'Lemon', checked: false },
   ]);
@@ -23,41 +25,63 @@ export default function RecipeTemplate() {
     setIngredients(copy);
   };
 
-  const addIngredient = name => {
+  const addIngredient = () => {
     const copy = [...ingredients];
-    copy.push({ name, checked: false });
+    copy.push({ name: newIngredient, checked: false });
     setIngredients(copy);
+    setNewIngredient('');
   };
 
-  const IngredientChecklist = () =>
-    ingredients.map((ingredient, i) => (
-      <Fragment>
-        <Input
-          type="checkbox"
-          id={`ingredient-${i}`}
-          checked={ingredient.checked}
-          onChange={() => checkIngredient(i)}
-        />
-        <Label for={`ingredient-${i}`} check>
-          <CardText>{ingredient.name}</CardText>
-        </Label>
-      </Fragment>
-    ));
+  const IngredientChecklist = () => (
+    <FormGroup check>
+      {ingredients.map((ingredient, i) => (
+        <Fragment key={`ingredient-${i}`}>
+          <Input
+            type="checkbox"
+            id={`ingredient-${i}`}
+            checked={ingredient.checked}
+            onChange={() => checkIngredient(i)}
+          />
+          <Label check>
+            <CardText>{ingredient.name}</CardText>
+          </Label>
+        </Fragment>
+      ))}
+    </FormGroup>
+  );
 
   const IngredientsCard = () => (
     <Card>
       <CardTitle>Ingredients</CardTitle>
       <CardBody>
-        <FormGroup check>
+        <Form autoComplete="off" onSubmit={e => e.preventDefault()}>
           <IngredientChecklist />
-        </FormGroup>
+          <br />
+          <FormGroup>
+            <Input
+              type="text"
+              id="add-ingredient"
+              name="add-ingredient"
+              placeholder="New ingredient"
+              value={newIngredient}
+              onChange={e => setNewIngredient(e.target.value)}
+            />
+            <Button
+              name="add-ingredient-button"
+              onClick={addIngredient}
+              color="success"
+            >
+              Add
+            </Button>
+          </FormGroup>
+        </Form>
       </CardBody>
     </Card>
   );
 
   return (
     <Fragment>
-      <Form onSubmit={e => e.preventDefault()}>
+      <Form autoComplete="off" onSubmit={e => e.preventDefault()}>
         <FormGroup>
           <Input
             type="text"
@@ -65,11 +89,11 @@ export default function RecipeTemplate() {
             placeholder="Untitled"
             className="form-control-lg"
             value={title}
-            onChange={e => setTitle(e.targetValue)}
+            onChange={e => setTitle(e.target.value)}
           />
         </FormGroup>
-        <IngredientsCard />
       </Form>
+      <IngredientsCard />
     </Fragment>
   );
 }
